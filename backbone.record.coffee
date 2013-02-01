@@ -8,17 +8,21 @@
     root.Backbone.Record = factory(root.Backbone, root._)
 ) this, (Backbone, _) ->
 
-  RecordMixin =
+  class Record extends Backbone.Model
 
-    define: (recordFields...) ->
+    silentUpdate: false
+
+    @define: (recordFields...) ->
       this.prototype.recordFields = recordFields
       for fieldName in recordFields
         do (fieldName) =>
           Object.defineProperty this.prototype, fieldName,
-            get: -> this.get fieldName
-            set: (value) -> this.set fieldName, value
+            get: ->
+              this.get(fieldName)
+            set: (value) ->
+              this.set(fieldName, value, {silent: this.silentUpdate})
 
-  class Record extends Backbone.Model
-    _.extend(this, RecordMixin)
-
-  {Record, RecordMixin}
+    set: (name, value, options) ->
+      if not (name of this.recordFields)
+        throw new Error("invalid field name '#{name}' for '#{this.constructor.name}' record")
+      super
