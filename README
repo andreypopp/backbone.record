@@ -1,1 +1,17 @@
-Backbone.Record — Backbone.Model with fields defined as properties.
+Record = require 'backbone.record'
+
+class User extends Record
+  @define 'username', 'email'
+
+user = new User
+
+# calls user.set('username', 'andreypopp') and so fires 'change:username' events
+user.username = 'andreypopp'
+
+# calls user.get('username')
+console.log(user.username)
+
+# throws an error cause 'name' attribute wasn't defined
+user.name = 'Andrey Popp'
+
+

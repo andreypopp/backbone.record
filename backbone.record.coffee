@@ -11,6 +11,7 @@
   class Record extends Backbone.Model
 
     silentUpdate: false
+    restrictedUpdate: true
 
     @define: (recordFields...) ->
       this.prototype.recordFields = recordFields
@@ -23,6 +24,9 @@
               this.set(fieldName, value, {silent: this.silentUpdate})
 
     set: (name, value, options) ->
-      if not (name of this.recordFields)
-        throw new Error("invalid field name '#{name}' for '#{this.constructor.name}' record")
-      super
+      if (typeof name == 'object')
+        super
+      else
+        if not (name of this.recordFields) and this.restrictedUpdate
+          throw new Error("invalid field name '#{name}' for '#{this.constructor.name}' record")
+        super

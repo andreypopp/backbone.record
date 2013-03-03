@@ -50,10 +50,14 @@ var __hasProp = {}.hasOwnProperty,
     };
 
     Record.prototype.set = function(name, value, options) {
-      if (!(name in this.recordFields)) {
-        throw new Error("invalid field name '" + name + "' for '" + this.constructor.name + "' record");
+      if (typeof name === 'object') {
+        return Record.__super__.set.apply(this, arguments);
+      } else {
+        if (!(name in this.recordFields)) {
+          throw new Error("invalid field name '" + name + "' for '" + this.constructor.name + "' record");
+        }
+        return Record.__super__.set.apply(this, arguments);
       }
-      return Record.__super__.set.apply(this, arguments);
     };
 
     return Record;
