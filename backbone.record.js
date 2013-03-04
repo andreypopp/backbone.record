@@ -13,8 +13,9 @@ var __hasProp = {}.hasOwnProperty,
   } else {
     return root.Backbone.Record = factory(root.Backbone, root._);
   }
-})(this, function(Backbone, _) {
-  var Record;
+})(this, function(Backbone, _arg) {
+  var Record, contains;
+  contains = _arg.contains;
   return Record = (function(_super) {
 
     __extends(Record, _super);
@@ -24,6 +25,8 @@ var __hasProp = {}.hasOwnProperty,
     }
 
     Record.prototype.silentUpdate = false;
+
+    Record.prototype.restrictedUpdate = true;
 
     Record.define = function() {
       var fieldName, recordFields, _i, _len, _results,
@@ -53,7 +56,7 @@ var __hasProp = {}.hasOwnProperty,
       if (typeof name === 'object') {
         return Record.__super__.set.apply(this, arguments);
       } else {
-        if (!(name in this.recordFields)) {
+        if (!contains(this.recordFields, name) && this.restrictedUpdate) {
           throw new Error("invalid field name '" + name + "' for '" + this.constructor.name + "' record");
         }
         return Record.__super__.set.apply(this, arguments);

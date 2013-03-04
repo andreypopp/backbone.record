@@ -6,7 +6,7 @@
     module.exports = factory(require('backbone'), require('underscore'))
   else
     root.Backbone.Record = factory(root.Backbone, root._)
-) this, (Backbone, _) ->
+) this, (Backbone, {contains}) ->
 
   class Record extends Backbone.Model
 
@@ -27,6 +27,6 @@
       if (typeof name == 'object')
         super
       else
-        if not (name of this.recordFields) and this.restrictedUpdate
+        if not contains(this.recordFields, name) and this.restrictedUpdate
           throw new Error("invalid field name '#{name}' for '#{this.constructor.name}' record")
         super
