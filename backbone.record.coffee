@@ -23,10 +23,15 @@
             set: (value) ->
               this.set(fieldName, value, {silent: this.silentUpdate})
 
-    set: (name, value, options) ->
-      if (typeof name == 'object')
-        super
+    set: (key, val, options) ->
+      if (typeof key == 'object')
+        attrs = key
+        options = val
       else
-        if not contains(this.recordFields, name) and this.restrictedUpdate
-          throw new Error("invalid field name '#{name}' for '#{this.constructor.name}' record")
-        super
+        (attrs = {})[key] = val
+
+      for k, v of attrs
+        if not contains(this.recordFields, k) and this.restrictedUpdate and k != 'id'
+          throw new Error("invalid field name '#{k}' for '#{this.constructor.name}' record")
+
+      super(attrs, options)
