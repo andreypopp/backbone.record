@@ -1,6 +1,6 @@
 {
   "name": "backbone.record",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "main": ["./backbone.record.js"],
   "dependencies": {
     "jquery": "~1.8.3",

@@ -30,7 +30,7 @@
       else
         (attrs = {})[key] = val
 
-      if restrictedUpdate
+      if this.restrictedUpdate
         for k, v of attrs
           if k != 'id' and not contains(this.recordFields, k)
             throw new Error("invalid field name '#{k}' for '#{this.constructor.name}' record")

@@ -60,7 +60,7 @@ var __hasProp = {}.hasOwnProperty,
       } else {
         (attrs = {})[key] = val;
       }
-      if (restrictedUpdate) {
+      if (this.restrictedUpdate) {
         for (k in attrs) {
           v = attrs[k];
           if (k !== 'id' && !contains(this.recordFields, k)) {
