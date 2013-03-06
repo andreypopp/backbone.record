@@ -30,8 +30,9 @@
       else
         (attrs = {})[key] = val
 
-      for k, v of attrs
-        if not contains(this.recordFields, k) and this.restrictedUpdate and k != 'id'
-          throw new Error("invalid field name '#{k}' for '#{this.constructor.name}' record")
+      if restrictedUpdate
+        for k, v of attrs
+          if k != 'id' and not contains(this.recordFields, k)
+            throw new Error("invalid field name '#{k}' for '#{this.constructor.name}' record")
 
       super(attrs, options)

@@ -60,10 +60,12 @@ var __hasProp = {}.hasOwnProperty,
       } else {
         (attrs = {})[key] = val;
       }
-      for (k in attrs) {
-        v = attrs[k];
-        if (!contains(this.recordFields, k) && this.restrictedUpdate && k !== 'id') {
-          throw new Error("invalid field name '" + k + "' for '" + this.constructor.name + "' record");
+      if (restrictedUpdate) {
+        for (k in attrs) {
+          v = attrs[k];
+          if (k !== 'id' && !contains(this.recordFields, k)) {
+            throw new Error("invalid field name '" + k + "' for '" + this.constructor.name + "' record");
+          }
         }
       }
       return Record.__super__.set.call(this, attrs, options);
