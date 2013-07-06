@@ -4,27 +4,26 @@
   "description": "records for Backbone",
   "main": "backbone.record.js",
   "dependencies": {
-    "jquery-browserify": "~1.8.1",
-    "backbone": "~0.9.10",
-    "underscore": "~1.4.4"
+    "backbone": "~1.0.0",
+    "underscore": "~1.5.0"
   },
   "repository": {
-      "type": "git",
-      "url": "git://github.com/andreypopp/backbone.record.git"
+    "type": "git",
+    "url": "git://github.com/andreypopp/backbone.record.git"
   },
   "homepage": "https://github.com/andreypopp/backbone.record",
   "keywords": [
-      "browser",
-      "backbone",
-      "data-binding",
-      "data",
-      "data-model",
-      "mvc"
+    "browser",
+    "backbone",
+    "data-binding",
+    "data",
+    "data-model",
+    "mvc"
   ],
   "author": {
-      "name": "Andrey Popp",
-      "email": "8mayday@gmail.com",
-      "url": "http://andreypopp.com"
+    "name": "Andrey Popp",
+    "email": "8mayday@gmail.com",
+    "url": "http://andreypopp.com"
   },
   "license": "MIT"
 }
