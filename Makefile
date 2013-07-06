@@ -1,3 +1,4 @@
+BIN = ./node_modules/.bin
 SRC = $(wildcard *.coffee)
 LIB = $(SRC:%.coffee=%.js)
 REPO = $(shell cat .git/config | grep url | xargs echo | sed -E 's/^url = //g')
@@ -7,11 +8,17 @@ all: build
 
 build: $(LIB)
 
+install:
+	npm install
+
 watch:
 	watch -n1 $(MAKE) build
 
 clean:
 	rm -f *.js
+
+test:
+	@$(BIN)/mocha complex -b -R spec --compilers coffee:coffee-script ./spec.coffee
 
 %.js: %.coffee
 	coffee -bcp $< > $@
@@ -42,6 +49,6 @@ define release
   	j.version = \"$$NEXT_VERSION\";\
   	var s = JSON.stringify(j, null, 2);\
   	require('fs').writeFileSync('./bower.json', s);" && \
-  git commit -m "release $$NEXT_VERSION" -- package.json && \
+  git commit -m "release $$NEXT_VERSION" -- package.json bower.json && \
   git tag "$$NEXT_VERSION" -m "release $$NEXT_VERSION"
 endef
