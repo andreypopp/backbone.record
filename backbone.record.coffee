@@ -13,6 +13,10 @@
     silentUpdate: false
     restrictedUpdate: true
 
+    @property: (name, def) ->
+      def = {get: def} if isFunction def
+      Object.defineProperty this.prototype, name, def
+
     @define: (args...) ->
       if args.length == 0
         throw new Error("invalid schema")
@@ -35,6 +39,8 @@
 
         for k, v of schema
           result[k] = if isFunction v
+            if not v?
+              null
             if v::listenTo? and v::model? or v::idAttribute?
               new v(response[k], parse: true)
             else

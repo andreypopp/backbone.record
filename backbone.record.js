@@ -28,6 +28,15 @@ var __hasProp = {}.hasOwnProperty,
 
     Record.prototype.restrictedUpdate = true;
 
+    Record.property = function(name, def) {
+      if (isFunction(def)) {
+        def = {
+          get: def
+        };
+      }
+      return Object.defineProperty(this.prototype, name, def);
+    };
+
     Record.define = function() {
       var args, k, schema, _i, _len;
       args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
@@ -55,9 +64,9 @@ var __hasProp = {}.hasOwnProperty,
         result = {};
         for (k in schema) {
           v = schema[k];
-          result[k] = isFunction(v) ? (v.prototype.listenTo != null) && (v.prototype.model != null) || (v.prototype.idAttribute != null) ? new v(response[k], {
+          result[k] = isFunction(v) ? (v == null ? null : void 0, (v.prototype.listenTo != null) && (v.prototype.model != null) || (v.prototype.idAttribute != null) ? new v(response[k], {
             parse: true
-          }) : new v(response[k]) : response[k];
+          }) : new v(response[k])) : response[k];
         }
         if (response.id != null) {
           result.id = response.id;
