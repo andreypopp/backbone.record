@@ -39,9 +39,9 @@
 
         for k, v of schema
           result[k] = if isFunction v
-            if not v?
+            if not response[k]?
               null
-            if v::listenTo? and v::model? or v::idAttribute?
+            else if v::listenTo? and v::model? or v::idAttribute?
               new v(response[k], parse: true)
             else
               new v(response[k])

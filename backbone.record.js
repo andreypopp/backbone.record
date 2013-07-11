@@ -64,9 +64,9 @@ var __hasProp = {}.hasOwnProperty,
         result = {};
         for (k in schema) {
           v = schema[k];
-          result[k] = isFunction(v) ? (v == null ? null : void 0, (v.prototype.listenTo != null) && (v.prototype.model != null) || (v.prototype.idAttribute != null) ? new v(response[k], {
+          result[k] = isFunction(v) ? response[k] == null ? null : (v.prototype.listenTo != null) && (v.prototype.model != null) || (v.prototype.idAttribute != null) ? new v(response[k], {
             parse: true
-          }) : new v(response[k])) : response[k];
+          }) : new v(response[k]) : response[k];
         }
         if (response.id != null) {
           result.id = response.id;
