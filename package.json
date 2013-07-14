@@ -3,10 +3,7 @@
   "version": "0.8.0",
   "description": "records for Backbone",
   "main": "backbone.record.js",
-  "dependencies": {
-    "backbone": "~1.0.0",
-    "underscore": "~1.5.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "coffee-script": "",
     "mocha": "",
