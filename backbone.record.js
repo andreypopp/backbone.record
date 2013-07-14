@@ -28,6 +28,8 @@ var __hasProp = {}.hasOwnProperty,
 
     Record.prototype.restrictedUpdate = true;
 
+    Record.prototype._reservedKeys = ['id', 'cid', 'attributes', 'collection', 'changed', '_changing', '_previousAttributes', '_pending'];
+
     Record.property = function(name, def) {
       if (isFunction(def)) {
         def = {
@@ -108,7 +110,7 @@ var __hasProp = {}.hasOwnProperty,
       if (this.restrictedUpdate) {
         for (k in attrs) {
           v = attrs[k];
-          if (k !== 'id' && !contains(this._schemaKeys, k)) {
+          if (!contains(this._reservedKeys, k) && !contains(this._schemaKeys, k)) {
             throw new Error("invalid field name '" + k + "' for '" + this.constructor.name + "' record");
           }
         }

@@ -12,6 +12,9 @@
 
     silentUpdate: false
     restrictedUpdate: true
+    _reservedKeys: [
+      'id', 'cid', 'attributes', 'collection', 'changed',
+      '_changing', '_previousAttributes', '_pending']
 
     @property: (name, def) ->
       def = {get: def} if isFunction def
@@ -71,7 +74,7 @@
 
       if this.restrictedUpdate
         for k, v of attrs
-          if k != 'id' and not contains(this._schemaKeys, k)
+          if not contains(this._reservedKeys, k) and not contains(this._schemaKeys, k)
             throw new Error("invalid field name '#{k}' for '#{this.constructor.name}' record")
 
       super(attrs, options)
