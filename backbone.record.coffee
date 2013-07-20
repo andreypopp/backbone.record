@@ -32,29 +32,8 @@
         schema = args[0]
 
       this._defineAccessors(schema)
-      this._defineParse(schema)
       this.prototype.schema = schema
       this.prototype._schemaKeys = Object.keys(schema)
-
-    @_defineParse: (schema) ->
-      this.prototype.parse = (response, options) ->
-        result = {}
-
-        for k, v of schema
-          result[k] = if isFunction v
-            if not response[k]?
-              null
-            else if v::listenTo? and v::model? or v::idAttribute?
-              new v(response[k], parse: true)
-            else
-              new v(response[k])
-          else
-            response[k]
-
-        if response.id?
-          result.id = response.id
-
-        result
 
     @_defineAccessors: (schema) ->
       for fieldName, _ of schema
@@ -64,6 +43,25 @@
               this.get(fieldName)
             set: (value) ->
               this.set(fieldName, value, {silent: this.silentUpdate})
+
+    parse: (response, options) ->
+      result = {}
+
+      for k, v of this.schema
+        result[k] = if isFunction v
+          if not response[k]?
+            null
+          else if v::listenTo? and v::model? or v::idAttribute?
+            new v(response[k], parse: true)
+          else
+            new v(response[k])
+        else
+          response[k]
+
+      if response.id?
+        result.id = response.id
+
+      result
 
     set: (key, val, options) ->
       if (typeof key == 'object')

@@ -55,26 +55,8 @@ var __hasProp = {}.hasOwnProperty,
         schema = args[0];
       }
       this._defineAccessors(schema);
-      this._defineParse(schema);
       this.prototype.schema = schema;
       return this.prototype._schemaKeys = Object.keys(schema);
-    };
-
-    Record._defineParse = function(schema) {
-      return this.prototype.parse = function(response, options) {
-        var k, result, v;
-        result = {};
-        for (k in schema) {
-          v = schema[k];
-          result[k] = isFunction(v) ? response[k] == null ? null : (v.prototype.listenTo != null) && (v.prototype.model != null) || (v.prototype.idAttribute != null) ? new v(response[k], {
-            parse: true
-          }) : new v(response[k]) : response[k];
-        }
-        if (response.id != null) {
-          result.id = response.id;
-        }
-        return result;
-      };
     };
 
     Record._defineAccessors = function(schema) {
@@ -97,6 +79,22 @@ var __hasProp = {}.hasOwnProperty,
         })(fieldName));
       }
       return _results;
+    };
+
+    Record.prototype.parse = function(response, options) {
+      var k, result, v, _ref1;
+      result = {};
+      _ref1 = this.schema;
+      for (k in _ref1) {
+        v = _ref1[k];
+        result[k] = isFunction(v) ? response[k] == null ? null : (v.prototype.listenTo != null) && (v.prototype.model != null) || (v.prototype.idAttribute != null) ? new v(response[k], {
+          parse: true
+        }) : new v(response[k]) : response[k];
+      }
+      if (response.id != null) {
+        result.id = response.id;
+      }
+      return result;
     };
 
     Record.prototype.set = function(key, val, options) {
