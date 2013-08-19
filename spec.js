@@ -9,7 +9,7 @@ Collection = require('backbone').Collection;
 
 isEmpty = require('underscore').isEmpty;
 
-Record = require('./backbone.record');
+Record = require('./index');
 
 describe('Backbone.Record', function() {
   describe('schema with just fields', function() {

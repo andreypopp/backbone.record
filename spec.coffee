@@ -1,7 +1,7 @@
 {ok, equal, deepEqual} = require 'assert'
 {Collection} = require 'backbone'
 {isEmpty} = require 'underscore'
-Record = require './backbone.record'
+Record = require './index'
 
 describe 'Backbone.Record', ->
 

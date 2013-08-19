@@ -2,7 +2,7 @@
   "name": "backbone.record",
   "version": "0.9.1",
   "description": "records for Backbone",
-  "main": "backbone.record.js",
+  "main": "index.js",
   "dependencies": {},
   "peerDependencies": {
     "backbone": "1.x.x",
