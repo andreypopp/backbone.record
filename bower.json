@@ -4,5 +4,8 @@
   "main": [
     "./backbone.record.js"
   ],
-  "dependencies": {}
+  "dependencies": {
+    "backbone": "1.x.x",
+    "underscore": "1.x.x"
+  }
 }

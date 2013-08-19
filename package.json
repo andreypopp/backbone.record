@@ -4,6 +4,10 @@
   "description": "records for Backbone",
   "main": "backbone.record.js",
   "dependencies": {},
+  "peerDependencies": {
+    "backbone": "1.x.x",
+    "underscore": "1.x.x"
+  },
   "devDependencies": {
     "coffee-script": "",
     "mocha": "",
