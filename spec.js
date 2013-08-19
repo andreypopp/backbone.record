@@ -349,8 +349,8 @@ describe('Backbone.Record', function() {
     describe('validators', function() {
       var validate;
 
-      validate = function(validator, value) {
-        return isEmpty(validator.validate(value));
+      validate = function(validator, value, isNew) {
+        return isEmpty(validator.validate(value, isNew));
       };
       describe('Number', function() {
         it('validates', function() {
@@ -393,9 +393,19 @@ describe('Backbone.Record', function() {
           ok(!validate(attribute.Object, void 0));
           return ok(!validate(attribute.Object, null));
         });
-        return it('validates optional values', function() {
+        it('validates optional values', function() {
           ok(validate(attribute.Object.optional(), void 0));
           return ok(validate(attribute.Object.optional(), null));
+        });
+        return it('validates optional values for isNew state', function() {
+          ok(validate(attribute.Object.optionalWhenNew(), void 0, true));
+          ok(validate(attribute.Object.optionalWhenNew(), null, true));
+          ok(validate(attribute.Object.optional(), void 0, true));
+          ok(validate(attribute.Object.optional(), null, true));
+          ok(validate(attribute.Object.optional(), void 0, false));
+          ok(validate(attribute.Object.optional(), null, false));
+          ok(!validate(attribute.Object.optionalWhenNew(), void 0, false));
+          return ok(!validate(attribute.Object.optionalWhenNew(), null, false));
         });
       });
     });

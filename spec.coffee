@@ -152,8 +152,8 @@ describe 'Backbone.Record', ->
 
     describe 'validators', ->
 
-      validate = (validator, value) ->
-        isEmpty validator.validate(value)
+      validate = (validator, value, isNew) ->
+        isEmpty validator.validate(value, isNew)
 
       describe 'Number', ->
 
@@ -200,6 +200,16 @@ describe 'Backbone.Record', ->
         it 'validates optional values', ->
           ok validate(attribute.Object.optional(), undefined)
           ok validate(attribute.Object.optional(), null)
+
+        it 'validates optional values for isNew state', ->
+          ok validate(attribute.Object.optionalWhenNew(), undefined, true)
+          ok validate(attribute.Object.optionalWhenNew(), null, true)
+          ok validate(attribute.Object.optional(), undefined, true)
+          ok validate(attribute.Object.optional(), null, true)
+          ok validate(attribute.Object.optional(), undefined, false)
+          ok validate(attribute.Object.optional(), null, false)
+          ok not validate(attribute.Object.optionalWhenNew(), undefined, false)
+          ok not validate(attribute.Object.optionalWhenNew(), null, false)
 
     describe 'validation with nested models', ->
 

@@ -61,7 +61,7 @@
         value = response[k]
         result[k] = if isFunction validator
           createOfType(validator, value) if value?
-        else if isFunction validator.type
+        else if isFunction validator?.type
           createOfType(validator.type, value) if value?
         else
           value
@@ -85,18 +85,19 @@
 
       super(attrs, options)
 
-    @validate: (attributes, options) ->
+    validate: (attributes, options) ->
       errors = undefined
+      isNew = this.isNew()
 
-      if this::schema
-        for k, v of this::schema when isFunction v.validate
-          attrErrors = v.validate attributes[k]
+      if this.schema
+        for k, v of this.schema when isFunction v?.validate
+          attrErrors = v.validate attributes[k], isNew
           continue if isEmpty attrErrors
           errors or= {}
           errors[k] = attrErrors
 
-      if this::invariants
-        for inv in this::invariants
+      if this.invariants
+        for inv in this.invariants
           invErrors = inv.call(this, attributes)
           continue if isEmpty invErrors
           errors or= {}
@@ -104,9 +105,6 @@
           errors.self = errors.self.concat invErrors
 
       errors
-
-    validate: (attributes, options) ->
-      this.constructor.validate(attributes, options)
 
   class Validator
 
@@ -120,15 +118,22 @@
     optional: ->
       this.new {optional: true}
 
+    optionalWhenNew: ->
+      this.new {optionalWhenNew: true}
+
     oneOf: (choices...) ->
       this.new {choices: choices}
 
     ofType: (type) ->
       this.new {type: type}
 
-    validate: (value) ->
+    validate: (value, isNew) ->
       errors = []
-      if not this.options.optional and not value?
+
+      optional = this.options.optional
+      optional = optional or this.options.optionalWhenNew if isNew
+
+      if not optional and not value?
         errors.push "required"
       if this.options.choices and not contains this.options.choices, value
         errors.push "should be one of #{this.options.choices}"
@@ -170,6 +175,8 @@
 
   Record: Record
   attribute:
+    optional: (args...) -> (new Validator).optional(args...)
+    optionalWhenNew: (args...) -> (new Validator).optionalWhenNew(args...)
     oneOf: (args...) -> (new Validator).oneOf(args...)
     ofType: (args...) -> (new Validator).ofType(args...)
     Object: new Validator

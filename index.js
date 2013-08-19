@@ -108,7 +108,7 @@ var __hasProp = {}.hasOwnProperty,
       for (k in _ref1) {
         validator = _ref1[k];
         value = response[k];
-        result[k] = isFunction(validator) ? value != null ? createOfType(validator, value) : void 0 : isFunction(validator.type) ? value != null ? createOfType(validator.type, value) : void 0 : value;
+        result[k] = isFunction(validator) ? value != null ? createOfType(validator, value) : void 0 : isFunction(validator != null ? validator.type : void 0) ? value != null ? createOfType(validator.type, value) : void 0 : value;
       }
       if (response.id != null) {
         result.id = response.id;
@@ -136,18 +136,19 @@ var __hasProp = {}.hasOwnProperty,
       return Record.__super__.set.call(this, attrs, options);
     };
 
-    Record.validate = function(attributes, options) {
-      var attrErrors, errors, inv, invErrors, k, v, _i, _len, _ref1, _ref2;
+    Record.prototype.validate = function(attributes, options) {
+      var attrErrors, errors, inv, invErrors, isNew, k, v, _i, _len, _ref1, _ref2;
 
       errors = void 0;
-      if (this.prototype.schema) {
-        _ref1 = this.prototype.schema;
+      isNew = this.isNew();
+      if (this.schema) {
+        _ref1 = this.schema;
         for (k in _ref1) {
           v = _ref1[k];
-          if (!(isFunction(v.validate))) {
+          if (!(isFunction(v != null ? v.validate : void 0))) {
             continue;
           }
-          attrErrors = v.validate(attributes[k]);
+          attrErrors = v.validate(attributes[k], isNew);
           if (isEmpty(attrErrors)) {
             continue;
           }
@@ -155,8 +156,8 @@ var __hasProp = {}.hasOwnProperty,
           errors[k] = attrErrors;
         }
       }
-      if (this.prototype.invariants) {
-        _ref2 = this.prototype.invariants;
+      if (this.invariants) {
+        _ref2 = this.invariants;
         for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
           inv = _ref2[_i];
           invErrors = inv.call(this, attributes);
@@ -169,10 +170,6 @@ var __hasProp = {}.hasOwnProperty,
         }
       }
       return errors;
-    };
-
-    Record.prototype.validate = function(attributes, options) {
-      return this.constructor.validate(attributes, options);
     };
 
     return Record;
@@ -197,6 +194,12 @@ var __hasProp = {}.hasOwnProperty,
       });
     };
 
+    Validator.prototype.optionalWhenNew = function() {
+      return this["new"]({
+        optionalWhenNew: true
+      });
+    };
+
     Validator.prototype.oneOf = function() {
       var choices;
 
@@ -212,11 +215,15 @@ var __hasProp = {}.hasOwnProperty,
       });
     };
 
-    Validator.prototype.validate = function(value) {
-      var errors;
+    Validator.prototype.validate = function(value, isNew) {
+      var errors, optional;
 
       errors = [];
-      if (!this.options.optional && (value == null)) {
+      optional = this.options.optional;
+      if (isNew) {
+        optional = optional || this.options.optionalWhenNew;
+      }
+      if (!optional && (value == null)) {
         errors.push("required");
       }
       if (this.options.choices && !contains(this.options.choices, value)) {
@@ -309,6 +316,18 @@ var __hasProp = {}.hasOwnProperty,
   return {
     Record: Record,
     attribute: {
+      optional: function() {
+        var args, _ref3;
+
+        args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        return (_ref3 = new Validator).optional.apply(_ref3, args);
+      },
+      optionalWhenNew: function() {
+        var args, _ref3;
+
+        args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        return (_ref3 = new Validator).optionalWhenNew.apply(_ref3, args);
+      },
       oneOf: function() {
         var args, _ref3;
 
