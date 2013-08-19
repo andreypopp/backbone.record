@@ -1,7 +1,7 @@
 {ok, equal, deepEqual} = require 'assert'
 {Collection} = require 'backbone'
 {isEmpty} = require 'underscore'
-Record = require './index'
+{Record, attribute, invariant} = require './index'
 
 describe 'Backbone.Record', ->
 
@@ -77,8 +77,8 @@ describe 'Backbone.Record', ->
 
     class User extends Record
       @define
-        birthday: Record.attribute.Number.min(1970)
-        email: Record.attribute.String.matches('.+@example.com')
+        birthday: attribute.Number.min(1970)
+        email: attribute.String.matches('.+@example.com')
 
     it 'validates on init', ->
       user = new User({birthday: 1969, email: 'andrey'}, parse: true, validate: true)
@@ -100,8 +100,8 @@ describe 'Backbone.Record', ->
     it 'treats all attributes as required by default', ->
       class User extends Record
         @define
-          birthday: Record.attribute.Number.min(1970)
-          email: Record.attribute.String.matches('.+@example.com')
+          birthday: attribute.Number.min(1970)
+          email: attribute.String.matches('.+@example.com')
       user = new User({}, parse: true, validate: true)
       ok user.validationError
       ok user.validationError.birthday
@@ -110,8 +110,8 @@ describe 'Backbone.Record', ->
     it 'allows to describe optional values', ->
       class User extends Record
         @define
-          birthday: Record.attribute.Number.min(1970).optional()
-          email: Record.attribute.String.matches('.+@example.com')
+          birthday: attribute.Number.min(1970).optional()
+          email: attribute.String.matches('.+@example.com')
       user = new User({}, parse: true, validate: true)
       ok user.validationError
       ok not user.validationError.birthday
@@ -124,11 +124,31 @@ describe 'Backbone.Record', ->
     it 'allows "one of" validation', ->
       class Model extends Record
         @define
-          a: Record.attribute.Object.oneOf(1, 2, 3)
+          a: attribute.Object.oneOf(1, 2, 3)
       ok new Model(a: 1).isValid()
       ok new Model(a: 2).isValid()
       ok new Model(a: 3).isValid()
       ok not new Model(a: 4).isValid()
+
+    describe 'invariants', ->
+
+      class M extends Record
+        @define
+          a: attribute.Number.min(1).optional()
+          b: attribute.Number.max(1).optional()
+
+        @invariant invariant.requireOneOf('a', 'b')
+
+        it 'validates', ->
+          m = new M(a: 1, b: 1)
+          ok m.isValid()
+          m = new M(a: 1)
+          ok m.isValid()
+          m = new M(b: 1)
+          ok m.isValid()
+          m = new M()
+          ok not m.isValid()
+          ok m.validationError.self
 
     describe 'validators', ->
 
@@ -138,62 +158,62 @@ describe 'Backbone.Record', ->
       describe 'Number', ->
 
         it 'validates', ->
-          ok validate(Record.attribute.Number, 1)
-          ok validate(Record.attribute.Number, '1')
-          ok not validate(Record.attribute.Number, 'x')
+          ok validate(attribute.Number, 1)
+          ok validate(attribute.Number, '1')
+          ok not validate(attribute.Number, 'x')
 
         it 'validates min', ->
-          ok validate(Record.attribute.Number.min(0), 1)
-          ok validate(Record.attribute.Number.min(0), 0)
-          ok not validate(Record.attribute.Number.min(0), -1)
+          ok validate(attribute.Number.min(0), 1)
+          ok validate(attribute.Number.min(0), 0)
+          ok not validate(attribute.Number.min(0), -1)
 
         it 'validates max', ->
-          ok validate(Record.attribute.Number.max(1), 1)
-          ok validate(Record.attribute.Number.max(0), 0)
-          ok not validate(Record.attribute.Number.max(0), 2)
+          ok validate(attribute.Number.max(1), 1)
+          ok validate(attribute.Number.max(0), 0)
+          ok not validate(attribute.Number.max(0), 2)
 
       describe 'String', ->
 
         it 'validates', ->
-          ok validate(Record.attribute.String, 'x')
-          ok not validate(Record.attribute.String, 1)
+          ok validate(attribute.String, 'x')
+          ok not validate(attribute.String, 1)
 
         it 'validates via regexp', ->
-          ok validate(Record.attribute.String.matches('[ab]'), 'a')
-          ok validate(Record.attribute.String.matches('[ab]'), 'b')
-          ok not validate(Record.attribute.String.matches('[ab]'), 'c')
+          ok validate(attribute.String.matches('[ab]'), 'a')
+          ok validate(attribute.String.matches('[ab]'), 'b')
+          ok not validate(attribute.String.matches('[ab]'), 'c')
 
       describe 'oneOf', ->
 
         it 'validates', ->
-          ok validate(Record.attribute.oneOf(1, 2), 1)
-          ok validate(Record.attribute.oneOf(1, 2), 2)
-          ok not validate(Record.attribute.oneOf(1, 2), 3)
+          ok validate(attribute.oneOf(1, 2), 1)
+          ok validate(attribute.oneOf(1, 2), 2)
+          ok not validate(attribute.oneOf(1, 2), 3)
 
       describe 'Object', ->
 
         it 'validates', ->
-          ok validate(Record.attribute.Object, 1)
-          ok not validate(Record.attribute.Object, undefined)
-          ok not validate(Record.attribute.Object, null)
+          ok validate(attribute.Object, 1)
+          ok not validate(attribute.Object, undefined)
+          ok not validate(attribute.Object, null)
 
         it 'validates optional values', ->
-          ok validate(Record.attribute.Object.optional(), undefined)
-          ok validate(Record.attribute.Object.optional(), null)
+          ok validate(attribute.Object.optional(), undefined)
+          ok validate(attribute.Object.optional(), null)
 
     describe 'validation with nested models', ->
 
       class Revision extends Record
         @define
-          timestamp: Record.attribute.ofType(Date)
+          timestamp: attribute.ofType(Date)
 
       class Revisions extends Collection
         model: Revision
 
       class Page extends Record
         @define
-          lastRevision: Record.attribute.ofType(Revision).optional()
-          history: Record.attribute.ofType(Revisions)
+          lastRevision: attribute.ofType(Revision).optional()
+          history: attribute.ofType(Revisions)
           
       it 'deserializes complex structures', ->
 

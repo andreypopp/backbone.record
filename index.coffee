@@ -26,6 +26,10 @@
       def = {get: def} if isFunction def
       Object.defineProperty this.prototype, name, def
 
+    @invariant: (invariant) ->
+      this::invariants or= []
+      this::invariants.push invariant
+
     @define: (args...) ->
       if args.length == 0
         throw new Error("invalid schema")
@@ -38,8 +42,8 @@
         schema = args[0]
 
       this._defineAccessors(schema)
-      this.prototype.schema = schema
-      this.prototype._schemaKeys = Object.keys(schema)
+      this::schema = schema
+      this::_schemaKeys = Object.keys(schema)
 
     @_defineAccessors: (schema) ->
       for fieldName, _ of schema
@@ -83,11 +87,22 @@
 
     @validate: (attributes, options) ->
       errors = undefined
-      for k, v of this.prototype.schema when isFunction v.validate
-        attrErrors = v.validate attributes[k]
-        continue if isEmpty attrErrors
-        errors or= {}
-        errors[k] = attrErrors
+
+      if this::schema
+        for k, v of this::schema when isFunction v.validate
+          attrErrors = v.validate attributes[k]
+          continue if isEmpty attrErrors
+          errors or= {}
+          errors[k] = attrErrors
+
+      if this::invariants
+        for inv in this::invariants
+          invErrors = inv.call(this, attributes)
+          continue if isEmpty invErrors
+          errors or= {}
+          errors.self or= []
+          errors.self = errors.self.concat invErrors
+
       errors
 
     validate: (attributes, options) ->
@@ -153,12 +168,16 @@
         errors.push "does not match expected pattern #{this.options.regexp}"
       errors
 
-  Record.Record = Record
-  Record.attribute =
+  Record: Record
+  attribute:
     oneOf: (args...) -> (new Validator).oneOf(args...)
     ofType: (args...) -> (new Validator).ofType(args...)
     Object: new Validator
     Number: new NumberAttribute
     String: new StringAttribute
-
-  Record
+  invariant:
+    requireOneOf: (names...) ->
+      (attributes) ->
+        for name in names
+          return if attributes[name]?
+        ["one of #{names.join(', ')} required"]

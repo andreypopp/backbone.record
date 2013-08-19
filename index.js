@@ -49,6 +49,13 @@ var __hasProp = {}.hasOwnProperty,
       return Object.defineProperty(this.prototype, name, def);
     };
 
+    Record.invariant = function(invariant) {
+      var _base;
+
+      (_base = this.prototype).invariants || (_base.invariants = []);
+      return this.prototype.invariants.push(invariant);
+    };
+
     Record.define = function() {
       var args, k, schema, _i, _len;
 
@@ -130,21 +137,36 @@ var __hasProp = {}.hasOwnProperty,
     };
 
     Record.validate = function(attributes, options) {
-      var attrErrors, errors, k, v, _ref1;
+      var attrErrors, errors, inv, invErrors, k, v, _i, _len, _ref1, _ref2;
 
       errors = void 0;
-      _ref1 = this.prototype.schema;
-      for (k in _ref1) {
-        v = _ref1[k];
-        if (!(isFunction(v.validate))) {
-          continue;
+      if (this.prototype.schema) {
+        _ref1 = this.prototype.schema;
+        for (k in _ref1) {
+          v = _ref1[k];
+          if (!(isFunction(v.validate))) {
+            continue;
+          }
+          attrErrors = v.validate(attributes[k]);
+          if (isEmpty(attrErrors)) {
+            continue;
+          }
+          errors || (errors = {});
+          errors[k] = attrErrors;
         }
-        attrErrors = v.validate(attributes[k]);
-        if (isEmpty(attrErrors)) {
-          continue;
+      }
+      if (this.prototype.invariants) {
+        _ref2 = this.prototype.invariants;
+        for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+          inv = _ref2[_i];
+          invErrors = inv.call(this, attributes);
+          if (isEmpty(invErrors)) {
+            continue;
+          }
+          errors || (errors = {});
+          errors.self || (errors.self = []);
+          errors.self = errors.self.concat(invErrors);
         }
-        errors || (errors = {});
-        errors[k] = attrErrors;
       }
       return errors;
     };
@@ -284,23 +306,42 @@ var __hasProp = {}.hasOwnProperty,
     return StringAttribute;
 
   })(Validator);
-  Record.Record = Record;
-  Record.attribute = {
-    oneOf: function() {
-      var args, _ref3;
+  return {
+    Record: Record,
+    attribute: {
+      oneOf: function() {
+        var args, _ref3;
 
-      args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-      return (_ref3 = new Validator).oneOf.apply(_ref3, args);
-    },
-    ofType: function() {
-      var args, _ref3;
+        args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        return (_ref3 = new Validator).oneOf.apply(_ref3, args);
+      },
+      ofType: function() {
+        var args, _ref3;
 
-      args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-      return (_ref3 = new Validator).ofType.apply(_ref3, args);
+        args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        return (_ref3 = new Validator).ofType.apply(_ref3, args);
+      },
+      Object: new Validator,
+      Number: new NumberAttribute,
+      String: new StringAttribute
     },
-    Object: new Validator,
-    Number: new NumberAttribute,
-    String: new StringAttribute
+    invariant: {
+      requireOneOf: function() {
+        var names;
+
+        names = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        return function(attributes) {
+          var name, _i, _len;
+
+          for (_i = 0, _len = names.length; _i < _len; _i++) {
+            name = names[_i];
+            if (attributes[name] != null) {
+              return;
+            }
+          }
+          return ["one of " + (names.join(', ')) + " required"];
+        };
+      }
+    }
   };
-  return Record;
 });
