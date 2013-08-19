@@ -18,7 +18,8 @@ clean:
 	rm -f *.js
 
 test:
-	@$(BIN)/mocha complex -b -R spec --compilers coffee:coffee-script ./spec.coffee
+	@$(BIN)/mocha complex -b -R progress \
+		--compilers coffee:coffee-script ./spec.coffee
 
 %.js: %.coffee
 	coffee -bcp $< > $@
