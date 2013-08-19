@@ -294,6 +294,12 @@ var __hasProp = {}.hasOwnProperty,
       });
     };
 
+    StringAttribute.prototype.allowEmpty = function() {
+      return this["new"]({
+        allowEmpty: true
+      });
+    };
+
     StringAttribute.prototype.validate = function(value) {
       var errors;
 
@@ -303,6 +309,9 @@ var __hasProp = {}.hasOwnProperty,
       }
       if (!isString(value)) {
         return ["should be a string"];
+      }
+      if (!this.options.allowEmpty && value.length === 0) {
+        return ["should not be empty"];
       }
       if (this.options.regexp && !this.options.regexp.exec(value)) {
         errors.push("does not match expected pattern " + this.options.regexp);

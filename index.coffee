@@ -164,11 +164,16 @@
       regexp = ///^#{regexp}$/// unless regexp instanceof RegExp
       this.new {regexp}
 
+    allowEmpty: ->
+      this.new {allowEmpty: true}
+
     validate: (value) ->
       errors = super
       return errors if errors.length > 0 or not value?
       if not isString value
         return ["should be a string"]
+      if not this.options.allowEmpty and value.length == 0
+        return ["should not be empty"]
       if this.options.regexp and not this.options.regexp.exec value
         errors.push "does not match expected pattern #{this.options.regexp}"
       errors
