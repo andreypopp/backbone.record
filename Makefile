@@ -22,7 +22,7 @@ test:
 		--compilers coffee:coffee-script ./spec.coffee
 
 %.js: %.coffee
-	coffee -bcp $< > $@
+	@coffee -bcp $< > $@
 
 release-patch: build test
 	@$(call release,patch)
